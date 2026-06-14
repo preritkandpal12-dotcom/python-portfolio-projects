@@ -1,4 +1,6 @@
 import requests
+import pandas as pd
+from datetime import datetime 
 CITIES = {
     "mumbai": {"lat": 19.0760, "lon": 72.877},
     "london": {"lat": 51.5074, "lon": -0.1278},
@@ -22,6 +24,17 @@ if response.status_code == 200:
 
     print(f"Current Temperature: {current['temperature']}°C")
     print(f"Wind Speed: {current['windspeed']} km/hr")
+    weather_dict = { 
+        "Timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M")],
+        "City": [user_choice .title()],
+        "Temperature (C)": [current ['temperature']],
+        "Wind Speed (km/hr)": [current['windspeed']]
+        
+    }
+
+    df= pd.DataFrame(weather_dict)
+    df.to_csv("my_weather_log.csv" , mode='a' , index = False , header=False)
+    print("\n Live data succesfully saved to my_weather_log.csv ")
 else:
     print("Network pipeline failed to fetch live data")
     
