@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-# CONSTANTS
 CITIES = {
     "mumbai": {"lat": 19.0760, "lon": 72.877},
     "london": {"lat": 51.5074, "lon": -0.1278},
@@ -13,7 +12,6 @@ def fetch_weather_data(city_name, coords):
     url = f"https://api.open-meteo.com/v1/forecast?latitude={coords['lat']}&longitude={coords['lon']}&current_weather=true"
     
     try:
-  
         response = requests.get(url)
         response.raise_for_status() 
         
@@ -35,22 +33,40 @@ def save_to_csv(weather_dict):
     df.to_csv("my_weather_log.csv", mode='a', index=False, header=False)
     print(f" Saved data for {weather_dict['City'][0]}")
 
+def generate_summary_report():
+    try:
+     
+        df = pd.read_csv("my_weather_log.csv", names=["Timestamp", "City", "Temperature", "Wind Speed"])
+        
+        print("\n Historical Weather Summary ")
+        
+        
+        hottest_temps = df.groupby('City')['Temperature'].max()
+        
+       
+        for city, temp in hottest_temps.items():
+            print(f" Highest temp recorded in {city}: {temp}°C")
+            
+        print("\n")
+        
+    except FileNotFoundError:
+        print(" No historical data found to summarize yet.")
+
+
 def run_pipeline():
-    print("\n Initiating bulletproof batch weather fetch...")
+    print("\n Initiating full ETL weather pipeline...")
     
+  
     for city_name, coords in CITIES.items():
         weather_data = fetch_weather_data(city_name, coords)
         
         if weather_data is not None:
             save_to_csv(weather_data)
             
+    generate_summary_report()
+            
     print(" Pipeline execution complete!\n")
 
 if __name__ == "__main__":
     run_pipeline()
-
-
-
-
-         
 
